@@ -16,11 +16,21 @@ async function run() {
     try {
         await client.connect();
         const productCollection = client.db('maxtools').collection('product');
+        const reviewCollection = client.db('maxtools').collection('reviews');
 
         //read all products
         app.get("/product", async (req, res) => {
             const query = req.query;
             const products = await productCollection
+                .find(query)
+                .sort({ _id: -1 })
+                .toArray();
+            res.send(products);
+        });
+        // read all reviews
+        app.get("/review", async (req, res) => {
+            const query = req.query;
+            const products = await reviewCollection
                 .find(query)
                 .sort({ _id: -1 })
                 .toArray();
