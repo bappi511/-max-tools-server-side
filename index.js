@@ -27,6 +27,13 @@ async function run() {
                 .toArray();
             res.send(products);
         });
+        // Get api to read one product
+        app.get("/product/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const product = await productCollection.findOne(filter);
+            res.send(product);
+        });
         // read all reviews
         app.get("/review", async (req, res) => {
             const query = req.query;
