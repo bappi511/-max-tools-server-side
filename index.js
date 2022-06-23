@@ -17,7 +17,27 @@ async function run() {
         await client.connect();
         const productCollection = client.db('maxtools').collection('product');
         const reviewCollection = client.db('maxtools').collection('reviews');
+        const userCollection = client.db("maxtools").collection("users");
 
+        // Verify JWT middleware
+        const jwtVerify = (req, res, next) => {
+            const authHeader = req.headers.authorization;
+            if (!authHeader) {
+                return res.status(401).send({ message: "Unauthorize access!" });
+            }
+            const token = authHeader.split(" ")[1];
+            jwt.verify(
+                token,
+                process.env.ACCESS_TOKEN_SECRET,
+                function (error, decoded) {
+                    if (error) {
+                        return res.status(403).send({ message: "Forbidden access!" });
+                    }
+                    req.decoded = decoded;
+                    next();
+                }
+            );
+        };
         //read all products
         app.get("/product", async (req, res) => {
             const query = req.query;
