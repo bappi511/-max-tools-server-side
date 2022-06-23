@@ -47,7 +47,7 @@ async function run() {
                 .toArray();
             res.send(products);
         });
-        // Get api to read one product
+        //one product api
         app.get("/product/:id", async (req, res) => {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) };
@@ -62,6 +62,15 @@ async function run() {
                 .sort({ _id: -1 })
                 .toArray();
             res.send(products);
+        });
+
+        // check admin api
+        app.get("/admin/:email", jwtVerify, async (req, res) => {
+            const email = req.params.email;
+            const user = await userCollection.findOne({ email: email });
+            const isAdmin = user?.role === "admin";
+
+            res.send({ admin: isAdmin });
         });
     }
     finally {
