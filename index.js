@@ -38,6 +38,27 @@ async function run() {
                 }
             );
         };
+        // Put api to add user
+        app.put("/user/:email", async (req, res) => {
+            const email = req.params.email;
+            const data = req.body;
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: data,
+            };
+            const result = await userCollection.updateOne(
+                filter,
+                updateDoc,
+                options
+            );
+            const token = jwt.sign(
+                { email: email },
+                process.env.ACCESS_TOKEN_SECRET
+            );
+            res.send({ token, result });
+        });
+
         //read all products
         app.get("/product", async (req, res) => {
             const query = req.query;
@@ -86,6 +107,25 @@ async function run() {
             const product = await userCollection.findOne(filter);
             res.send(product);
         });
+        // to make admin api 
+        app.put("/user/admin/:email", jwtVerify, async (req, res) => {
+            const email = req.params.email;
+            const filter = { email: email };
+            const updateDoc = {
+                $set: { role: "admin" },
+            };
+            const requesterEmail = req.decoded.email;
+            const requesterUser = await userCollection.findOne({
+                email: requesterEmail,
+            });
+            if (requesterUser.role === "admin") {
+                const result = await userCollection.updateOne(filter, updateDoc);
+                res.send({ success: true, result });
+            } else {
+                res.status(403).send({ message: "forbidden" });
+            }
+        });
+
     }
     finally {
 
