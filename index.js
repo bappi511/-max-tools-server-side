@@ -38,6 +38,21 @@ async function run() {
                 }
             );
         };
+
+        //    Verify Admin middleware
+
+        const verifyAdmin = async (req, res, next) => {
+            const requesterEmail = req.decoded.email;
+            const requesterUser = await userCollection.findOne({
+                email: requesterEmail,
+            });
+            if (requesterUser.role === "admin") {
+                next();
+            } else {
+                res.status(403).send({ message: "Forbidden access!" });
+            }
+        };
+
         // Put api to add user
         app.put("/user/:email", async (req, res) => {
             const email = req.params.email;
@@ -74,6 +89,13 @@ async function run() {
             const filter = { _id: ObjectId(id) };
             const product = await productCollection.findOne(filter);
             res.send(product);
+        });
+
+        // Post api to add product
+        app.post("/product", jwtVerify, verifyAdmin, async (req, res) => {
+            const data = req.body;
+            const result = await productCollection.insertOne(data);
+            res.send(result);
         });
         // read all reviews
         app.get("/review", async (req, res) => {
