@@ -72,6 +72,20 @@ async function run() {
 
             res.send({ admin: isAdmin });
         });
+        //all users api
+        app.get("/user", async (req, res) => {
+            const query = req.query;
+            const cursor = userCollection.find(query);
+            const services = await cursor.toArray();
+            res.send(services);
+        });
+        //one user users api
+        app.get("/user/:email", async (req, res) => {
+            const email = req.params.email;
+            const filter = { email: email };
+            const product = await userCollection.findOne(filter);
+            res.send(product);
+        });
     }
     finally {
 
