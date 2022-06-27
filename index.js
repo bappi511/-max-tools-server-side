@@ -15,7 +15,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         await client.connect();
-        const productCollection = client.db('maxtools').collection('product');
+        const productCollection = client.db('maxtools').collection('products');
         const orderCollection = client.db("maxtools").collection("orders");
 
         const reviewCollection = client.db('maxtools').collection('reviews');
