@@ -16,6 +16,8 @@ async function run() {
     try {
         await client.connect();
         const productCollection = client.db('maxtools').collection('product');
+        const orderCollection = client.db("maxtools").collection("orders");
+
         const reviewCollection = client.db('maxtools').collection('reviews');
         const userCollection = client.db("maxtools").collection("users");
 
@@ -122,7 +124,7 @@ async function run() {
             const services = await cursor.toArray();
             res.send(services);
         });
-        //one user users api
+        // Get api to read one user
         app.get("/user/:email", async (req, res) => {
             const email = req.params.email;
             const filter = { email: email };
@@ -147,6 +149,26 @@ async function run() {
                 res.status(403).send({ message: "forbidden" });
             }
         });
+
+        // Post api to add product
+        app.post("/order", jwtVerify, async (req, res) => {
+            const data = req.body;
+            const result = await orderCollection.insertOne(data);
+            res.send(result);
+        });
+        // Patch api to update availableUnit after placing order
+        app.patch("/product-available/:id", jwtVerify, async (req, res) => {
+            const id = req.params.id;
+            const data = req.body;
+            const filter = { _id: ObjectId(id) };
+            const updateDoc = {
+                $set: data,
+            };
+            const result = await productCollection.updateOne(filter, updateDoc);
+
+            res.send(result);
+        });
+
 
     }
     finally {
