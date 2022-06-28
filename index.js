@@ -170,7 +170,37 @@ async function run() {
                 res.status(403).send({ message: "forbidden" });
             }
         });
+        // Get api to read my orders
+        app.get("/order/", jwtVerify, async (req, res) => {
+            const email = req.query.email;
 
+            const decodedEmail = req.decoded.email;
+            if (email === decodedEmail) {
+                const query = { email: email };
+                const result = await orderCollection
+                    .find(query)
+                    .sort({ _id: -1 })
+                    .toArray();
+                res.send(result);
+            } else {
+                res.status(403).send({ message: "Forbidden access!" });
+            }
+        });
+        // Get api to read one order for payment
+        app.get("/order/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const order = await orderCollection.findOne(query);
+            res.send(order);
+        });
+        // Delete api to delete one order
+        app.delete("/order/:id", jwtVerify, async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await orderCollection.deleteOne(filter);
+
+            res.send(result);
+        });
         // Post api to add product
         app.post("/order", jwtVerify, async (req, res) => {
             const data = req.body;
