@@ -99,6 +99,27 @@ async function run() {
             const result = await productCollection.insertOne(data);
             res.send(result);
         });
+        // Delete api to delete one product
+        app.delete("/product/:id", jwtVerify, verifyAdmin, async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await productCollection.deleteOne(filter);
+
+            res.send(result);
+        });
+        // Patch api to update product
+        app.patch("/product/:id", jwtVerify, verifyAdmin, async (req, res) => {
+            const id = req.params.id;
+            const data = req.body;
+            const filter = { _id: ObjectId(id) };
+            const updateDoc = {
+                $set: data,
+            };
+            const result = await productCollection.updateOne(filter, updateDoc);
+
+            res.send(result);
+        });
+
         // read all reviews
         app.get("/review", async (req, res) => {
             const query = req.query;
