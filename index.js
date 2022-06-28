@@ -119,17 +119,6 @@ async function run() {
 
             res.send(result);
         });
-
-        // read all reviews
-        app.get("/review", async (req, res) => {
-            const query = req.query;
-            const products = await reviewCollection
-                .find(query)
-                .sort({ _id: -1 })
-                .toArray();
-            res.send(products);
-        });
-
         // check admin api
         app.get("/admin/:email", jwtVerify, async (req, res) => {
             const email = req.params.email;
@@ -219,8 +208,21 @@ async function run() {
 
             res.send(result);
         });
-
-
+        // Post api to add user review
+        app.post("/review", jwtVerify, async (req, res) => {
+            const data = req.body;
+            const result = await reviewCollection.insertOne(data);
+            res.send(result);
+        });
+        // Get api to read all reviews
+        app.get("/review", async (req, res) => {
+            const query = req.query;
+            const products = await reviewCollection
+                .find(query)
+                .sort({ _id: -1 })
+                .toArray();
+            res.send(products);
+        });
     }
     finally {
 
