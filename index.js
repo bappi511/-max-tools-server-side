@@ -247,6 +247,18 @@ async function run() {
             const result = await orderCollection.insertOne(data);
             res.send(result);
         });
+        // Patch api to update order
+        app.patch("/order/:id", jwtVerify, async (req, res) => {
+            const id = req.params.id;
+            const data = req.body;
+            const filter = { _id: ObjectId(id) };
+            const updateDoc = {
+                $set: data,
+            };
+            const result = await orderCollection.updateOne(filter, updateDoc);
+
+            res.send(result);
+        });
         // Patch api to update availableUnit after placing order
         app.patch("/product-available/:id", jwtVerify, async (req, res) => {
             const id = req.params.id;
