@@ -141,6 +141,24 @@ async function run() {
             const product = await userCollection.findOne(filter);
             res.send(product);
         });
+        // Patch api to update User
+        app.patch("/user/:email", async (req, res) => {
+            const email = req.params.email;
+            const data = req.body;
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: data,
+            };
+            const result = await userCollection.updateOne(
+                filter,
+                updateDoc,
+                options
+            );
+
+            res.send(result);
+        });
+
         // to make admin api 
         app.put("/user/admin/:email", jwtVerify, async (req, res) => {
             const email = req.params.email;
