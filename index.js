@@ -190,6 +190,39 @@ async function run() {
 
             res.send(result);
         });
+        // Get api to read all orders for admin
+        app.get("/all-orders", jwtVerify, verifyAdmin, async (req, res) => {
+            const allOrders = await orderCollection
+                .find({})
+                .sort({ _id: -1 })
+                .toArray();
+            res.send(allOrders);
+        });
+        // Delete api to delete one order
+        app.delete("/order/:id", jwtVerify, async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await orderCollection.deleteOne(filter);
+
+            res.send(result);
+        });
+        // Patch api to update order
+        app.patch(
+            "/order-shipped/:id",
+            jwtVerify,
+            verifyAdmin,
+            async (req, res) => {
+                const id = req.params.id;
+                const data = req.body;
+                const filter = { _id: ObjectId(id) };
+                const updateDoc = {
+                    $set: data,
+                };
+                const result = await orderCollection.updateOne(filter, updateDoc);
+
+                res.send(result);
+            }
+        );
         // Post api to add product
         app.post("/order", jwtVerify, async (req, res) => {
             const data = req.body;
