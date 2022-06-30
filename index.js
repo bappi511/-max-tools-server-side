@@ -271,6 +271,21 @@ async function run() {
 
             res.send(result);
         });
+        // Payment Intent Api
+        app.post("/create-payment-intent", jwtVerify, async (req, res) => {
+            const order = req.body;
+            console.log(order);
+            const price = order.orderAmount;
+            const amount = price * 100;
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: amount,
+                currency: "usd",
+                payment_method_types: ["card"],
+            });
+            res.send({
+                clientSecret: paymentIntent.client_secret,
+            });
+        });
         // Post api to add user review
         app.post("/review", jwtVerify, async (req, res) => {
             const data = req.body;
